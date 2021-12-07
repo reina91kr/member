@@ -5,15 +5,23 @@
 header{height: 100px;}
 
 nav ul {list-style:none; text-align: right; margin-right: 150px;}
-nav ul li {display: inline-block; margin: 10px; border-top: 3px solid #333; padding-top:10px;}
+nav ul li {display: inline-block; padding: 10px; margin: 10px; border-top: 3px solid #333; padding-top:10px;}
 nav ul li a {text-decoration: none; color: black}
 nav ul li:hover {background-color: #eee;}
 
+
+/*index 스타일*/
 section {text-align: center;}
 section h2{margin-bottom: 20px;}
 
+/*member list 스타일*/
+section table {width : 600px; border-collapse: collapse;}
+section h1{margin-bottom: 20px;}
+section table, th, td {border: 1px solid #ccc;  margin: 0 auto; padding: 10px;}
+section table th {background-color: #eee}
 
 
-
-/* index 스타일 */
-
+/*member view스타일*/
+section .tbl_view{width : 450px; border-collapse:collapse;}
+section .tbl_view input {width: 200px; height: 30px;}
+section .tbl_view tr td a {text-decoration: none; color; black}
