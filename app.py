@@ -11,7 +11,11 @@ def getconn():
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    if 'userID' in session:         #session에 userID가 존재하면
+        ssid = session.get('userID')        # 세션을 가져옴
+        return render_template('index.html', ssid = ssid)   #index로 보내기
+    else:
+        return render_template('index.html')
 
 @app.route('/navbar/')
 def navbar():
@@ -25,7 +29,11 @@ def memberlist():
     cur.execute(sql)
     rs = cur.fetchall()     #db에서 가져온 데이터
     conn.close()
-    return render_template('memberlist.html', rs=rs)    #받은 db를 다시 html로 보냄
+    if 'userID' in session:     #session에 userID가 존재하면
+        ssid = session.get('userID')    #session을 가져옴
+        return render_template('memberlist.html', ssid=ssid, rs = rs)
+    else:
+        return render_template('memberlist.html', rs=rs)    #받은 db를 다시 html로 보냄
 
 @app.route('/member_view/<string:id>')
 def member_view(id):     #id를 경로로 설정하고 매개변수 넘겨줌
@@ -35,7 +43,11 @@ def member_view(id):     #id를 경로로 설정하고 매개변수 넘겨줌
     cur.execute(sql)
     rs = cur.fetchone()
     conn.close()
-    return render_template('member_view.html', rs = rs)
+    if 'userID' in session:
+        ssid = session.get('userID')
+        return render_template('member_view.html', ssid=ssid, rs = rs)
+    else:
+        return render_template('member_view.html', rs = rs)
 
 @app.route('/register/', methods = ['GET','POST'])
 def register():
@@ -84,5 +96,48 @@ def login():
 def logout():
     session.pop('userID')       #세션 삭제
     return redirect(url_for('index'))
+
+@app.route('/member_del/<string:id>')       #삭제URL 만들기
+def member_del(id):     #mid를 매개변수로 넘겨줌
+    conn = getconn()
+    cur = conn.cursor()
+    sql = "DELETE FROM member WHERE mid = '%s'" % (id)
+    cur.execute(sql)
+    conn.commit()
+    conn.close()
+
+    return redirect(url_for('memberlist'))
+
+@app.route('/member_edit/<string:id>', methods = ['GET','POST'])
+def member_edit(id):
+    if request.method=="POST":
+        #자료 넘겨받기
+        id = request.form['mid']
+        pwd = request.form['passwd']
+        name = request.form['name']
+        age = request.form['age']
+        date = request.form['regDate']
+        #db 연결
+        conn = getconn()
+        cur = conn.cursor()
+        sql = "UPDATE member SET passwd='%s', name='%s', age='%s', regDate='%s' " \
+              "WHERE mid='%s'" % (pwd, name, age, date, id)
+        cur.execute(sql)
+        conn.commit()
+        conn.close()
+        return redirect(url_for('member_view', id=id))  # url 경로로 이동
+    else:
+        #회원 자료 가져오기
+        conn = getconn()
+        cur = conn.cursor()
+        sql = "SELECT * FROM member WHERE mid = '%s'" % (id)
+        cur.execute(sql)
+        rs = cur.fetchone()
+        conn.close()
+        if 'userID' in session:
+            ssid = session.get('userID')
+            return render_template('member_edit.html', rs=rs, ssid=ssid)
+        else:
+            return render_template('member_edit.html')
 
 app.run(debug=True)

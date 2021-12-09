@@ -7,6 +7,12 @@
 </head>
 <body>
     <div id ="container">
+        <script>
+            {% if ssid == null %}
+                alert('먼저 로그인해주세요')
+                location.href = '/login/';
+            {% endif %}
+        </script>
         {% include 'navbar.html' %}
         <section>
             <h1>회원 목록</h1>
