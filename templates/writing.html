@@ -1,10 +1,36 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <meta charset="UTF-8">
+    <title>게시글 작성하기</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-$END$
+<div id="container">
+        {% include 'navbar.html' %}
+        <section>
+            <h1>게시글 작성하기</h1>
+            <form action = "{{ url_for('writing') }}" method="post" class="writing">
+                <table>
+                    <tr>
+                        <td>
+                            <input type="text" name="title" placeholder = "글 제목">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <textarea name="content" placeholder ="글 내용"></textarea>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <input type="submit" value="글쓰기">
+                            <input type="reset" value="취소">
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </section>
+    </div>
 </body>
 </html>

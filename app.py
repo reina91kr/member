@@ -11,11 +11,7 @@ def getconn():
 
 @app.route('/')
 def index():
-    if 'userID' in session:         #session에 userID가 존재하면
-        ssid = session.get('userID')        # 세션을 가져옴
-        return render_template('index.html', ssid = ssid)   #index로 보내기
-    else:
-        return render_template('index.html')
+    return render_template('index.html')
 
 @app.route('/navbar/')
 def navbar():
@@ -29,11 +25,7 @@ def memberlist():
     cur.execute(sql)
     rs = cur.fetchall()     #db에서 가져온 데이터
     conn.close()
-    if 'userID' in session:     #session에 userID가 존재하면
-        ssid = session.get('userID')    #session을 가져옴
-        return render_template('memberlist.html', ssid=ssid, rs = rs)
-    else:
-        return render_template('memberlist.html', rs=rs)    #받은 db를 다시 html로 보냄
+    return render_template('memberlist.html', rs=rs)    #받은 db를 다시 html로 보냄
 
 @app.route('/member_view/<string:id>')
 def member_view(id):     #id를 경로로 설정하고 매개변수 넘겨줌
@@ -43,32 +35,33 @@ def member_view(id):     #id를 경로로 설정하고 매개변수 넘겨줌
     cur.execute(sql)
     rs = cur.fetchone()
     conn.close()
-    if 'userID' in session:
-        ssid = session.get('userID')
-        return render_template('member_view.html', ssid=ssid, rs = rs)
-    else:
-        return render_template('member_view.html', rs = rs)
+    return render_template('member_view.html', rs = rs)
 
 @app.route('/register/', methods = ['GET','POST'])
 def register():
     if request.method == 'POST':
         #자료 수집하기
         id = request.form['mid']
-        pwd = request.form['passwd1']
+        pwd = request.form['passwd']
         name = request.form['name']
         age = request.form['age']
-        date = request.form['regDate']
+        # date = request.form['regDate']
 
         conn = getconn()
         cur = conn.cursor()
-        sql = "INSERT INTO member VALUES ('%s', '%s', '%s', '%s', '%s')" % (id, pwd, name, age, date)
+        sql = "INSERT INTO member (mid, passwd, name, age) VALUES ('%s', '%s', '%s', %s)" % (id, pwd, name, age)
         cur.execute(sql)
         conn.commit()
-        conn.close()
-        return redirect(url_for('memberlist'))   #url 경로로 이동
-
+        sql = "SELECT * FROM member WHERE mid = '%s'" % (id)
+        cur.execute(sql)
+        rs = cur.fetchone()
+        if rs:
+            session['userID'] = id
+            return redirect(url_for('memberlist'))   #url 경로로 이동
     else:
         return render_template('register.html') #get방식
+
+
 
 @app.route("/login/", methods = ['GET', 'POST'])
 def login():
@@ -116,12 +109,12 @@ def member_edit(id):
         pwd = request.form['passwd']
         name = request.form['name']
         age = request.form['age']
-        date = request.form['regDate']
+        # date = request.form['regDate']
+
         #db 연결
         conn = getconn()
         cur = conn.cursor()
-        sql = "UPDATE member SET passwd='%s', name='%s', age='%s', regDate='%s' " \
-              "WHERE mid='%s'" % (pwd, name, age, date, id)
+        sql = "UPDATE member SET passwd='%s', name='%s', age = %s WHERE mid='%s'" % (pwd, name, age, id)
         cur.execute(sql)
         conn.commit()
         conn.close()
@@ -134,10 +127,36 @@ def member_edit(id):
         cur.execute(sql)
         rs = cur.fetchone()
         conn.close()
-        if 'userID' in session:
-            ssid = session.get('userID')
-            return render_template('member_edit.html', rs=rs, ssid=ssid)
-        else:
-            return render_template('member_edit.html')
+        return render_template('member_edit.html', rs=rs)
+
+@app.route('/boardlist/')
+def boardlist():
+    conn = getconn()
+    cur = conn.cursor()
+    sql = "SELECT * FROM board ORDER BY bno DESC"       #게시글을 내림차순으로 정렬
+    cur.execute(sql)
+    rs = cur.fetchall()
+    conn.close()
+    return render_template('boardlist.html', rs = rs)
+
+@app.route('/writing/', methods = ['GET','POST'])
+def writing():
+    if request.method == "POST":
+        #자료 전달받기
+        title = request.form['title']
+        content = request.form['content']  #index는 대괄호
+        mid = session.get('userID')     #글쓴이 = 로그인한 사람 / #get함수는 ()
+
+        #db 연결하기
+        conn = getconn()
+        cur = conn.cursor()
+        sql = "INSERT INTO board (title, content, mid) VALUES ('%s', '%s', '%s')" % (title, content, mid)
+        cur.execute(sql)
+        conn.commit()
+        conn.close()
+        return redirect (url_for('boardlist'))
+
+    else:
+        return render_template('writing.html')
 
 app.run(debug=True)
