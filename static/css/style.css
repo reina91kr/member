@@ -56,7 +56,11 @@ section .tbl_edit input[type="submit"] {width: 100px; height: 30px;}
 section .tbl_edit input[type="reset"] {width: 100px; height: 30px;}
 
 /*board list 스타일*/
-section .btn_write{text-align: right; margin: 15px 200px;}
+section .tbl_bo_list{width: 700px; margin: 0 auto;}
+section .tbl_bo_list tr td:nth-child(2){text-align: left; padding-left: 20px}
+section .tbl_bo_list a{text-decoration:none; color: #000;}
+section .tbl_bo_list a:hover{text-decoration:underline; color: #000;}
+section .btn_write{text-align: right; margin: 15px 150px;}
 section .btn_write input {padding: 5px 20px;}
 
 /*writing 스타일*/
@@ -66,4 +70,8 @@ section .writing textarea{width: 550px; height: 200px; padding: 5px;}
 section .writing tr td input[type ='submit']{width: 100px; height: 30px;}
 section .writing tr td input[type='reset']{width: 100px; height: 30px;}
 
-
+/*board view 스타일*/
+section .tbl_bo_view{width: 600px; margin: 0 auto}
+section .tbl_bo_view input {width: 550px; height: 25px; padding: 5px}
+section .tbl_bo_view textarea {width: 550px; height: 300px; padding: 5px}
+section .tbl_bo_view a{color: #00f; }
